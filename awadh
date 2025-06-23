@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>بحث صور من Unsplash API</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      padding: 30px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .image-container img {
+      border-radius: 10px;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <h2>بحث صور عالية من Unsplash</h2>
+
+  <input type="text" id="searchInput" placeholder="أدخل كلمة البحث">
+  <button onclick="searchImages()">بحث</button>
+
+  <div class="image-container" id="resultsContainer"></div>
+
+  <script>
+    const accessKey = 'YOUR_ACCESS_KEY_HERE'; // ضع مفتاح API الخاص بك هنا
+
+    async function searchImages() {
+      const query = document.getElementById('searchInput').value.trim();
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = '';
+
+      if (!query) {
+        alert("يرجى إدخال كلمة البحث.");
+        return;
+      }
+
+      const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=8&client_id=${accessKey}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.results.length === 0) {
+          container.innerHTML = "<p>لم يتم العثور على صور.</p>";
+          return;
+        }
+
+        data.results.forEach(photo => {
+          const img = document.createElement('img');
+          img.src = photo.urls.small;
+          img.alt = photo.alt_description || query;
+          img.width = 300;
+          container.appendChild(img);
+        });
+      } catch (error) {
+        container.innerHTML = "<p>حدث خطأ أثناء جلب الصور.</p>";
+        console.error(error);
+      }
+    }
+  </script>
+
+</body>
+</html>
